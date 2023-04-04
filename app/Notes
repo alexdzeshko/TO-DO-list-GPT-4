@@ -1,0 +1,14 @@
+1. Doesn't work well with versions
+2. Good at troubleshooting - enter error and GPT will correct code
+3. It got harder when asked to create @Preview and need in abstraction required
+4. GPT suggests features to be implemented and guides throw implementation. It
+makes decisions like how to implement navigation in the app.
+5. OOP is human concept, machines can adopt it, but will be perfectly generate
+code without such limitations.
+6. At some point I stopped thinking and just copy/pasted code until it not working
+7. Since it doesn't have memory, GPT may generate next snippet slightly different
+from previously written - you either handle this yourself or ask for correction.
+
+(I apologize for the oversight.)
+🙏😅
+This combination of emojis represents an apology (🙏) and an acknowledgment of the oversight (😅).
