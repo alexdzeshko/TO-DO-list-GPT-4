@@ -8,6 +8,8 @@ code without such limitations.
 6. At some point I stopped thinking and just copy/pasted code until it not working
 7. Since it doesn't have memory, GPT may generate next snippet slightly different
 from previously written - you either handle this yourself or ask for correction.
+8. Limited output.
+9. Pay attention to query and try provide all details: write an app -or- write an app using industry-standard approach 
 
 (I apologize for the oversight.)
 🙏😅
