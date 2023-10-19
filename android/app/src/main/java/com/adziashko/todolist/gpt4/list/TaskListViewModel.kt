@@ -1,19 +1,21 @@
-package com.adziashko.todolist.gpt4
+package com.adziashko.todolist.gpt4.list
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.adziashko.todolist.gpt4.ITaskViewModel
 import com.adziashko.todolist.gpt4.data.Task
 import com.adziashko.todolist.gpt4.data.TaskDao
-import com.adziashko.todolist.gpt4.data.TaskDatabase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskViewModel(application: Application) : AndroidViewModel(application), ITaskViewModel {
-    private val taskDao: TaskDao = TaskDatabase.getDatabase(application).taskDao()
+@HiltViewModel
+class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : ViewModel(),
+    ITaskViewModel {
     override val tasks: LiveData<List<Task>> = taskDao.getAllTasks().map { taskList ->
         taskList.sortedBy { it.isCompleted }
     }.asLiveData()
@@ -41,7 +43,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application), I
     }
 
     override fun toggleTaskCompletionStatus(taskId: Int, isCompleted: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             taskDao.updateTaskCompletionStatus(taskId, isCompleted)
         }
     }

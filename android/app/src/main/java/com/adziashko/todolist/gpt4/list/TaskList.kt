@@ -1,4 +1,4 @@
-package com.adziashko.todolist.gpt4
+package com.adziashko.todolist.gpt4.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,36 +9,40 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.adziashko.todolist.gpt4.add.AddTaskDialog
 import com.adziashko.todolist.gpt4.data.Task
 
 @Composable
-fun TaskListApp(viewModel: ITaskViewModel, navController: NavController) {
+fun TaskList(viewModel: TaskListViewModel = hiltViewModel(), openTask: (task:Task)->Unit) {
     val tasks: State<List<Task>> = viewModel.tasks.observeAsState(emptyList())
-    val showDialog = remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
     // A surface container using the 'background' color from the theme
     Surface(color = MaterialTheme.colors.background) {
         Box(modifier = Modifier.fillMaxSize()) {
-            TaskList(tasks.value, onTaskChecked = { taskId, checked ->
-                viewModel.toggleTaskCompletionStatus(taskId, checked)
-            }, onTaskClick = { task ->
-                navController.navigate("editTask/${task.id}")
-            })
-            if (showDialog.value) {
+            TaskList(
+                tasks.value,
+                onTaskChecked = { taskId, checked ->
+                    viewModel.toggleTaskCompletionStatus(taskId, checked)
+                },
+                onTaskClick = openTask
+            )
+            if (showDialog) {
                 AddTaskDialog(
                     onAddTask = { title, description ->
                         viewModel.insert(Task(title = title, description = description))
-                        showDialog.value = false
+                        showDialog = false
                     },
-                    onDismiss = { showDialog.value = false }
+                    onDismiss = { showDialog = false }
                 )
             }
             Column(
@@ -48,7 +52,7 @@ fun TaskListApp(viewModel: ITaskViewModel, navController: NavController) {
             ) {
                 Spacer(modifier = Modifier.weight(1f))
                 FloatingActionButton(
-                    onClick = { showDialog.value = true }
+                    onClick = { showDialog = true }
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Task")
                 }
