@@ -3,6 +3,8 @@ package com.adziashko.todolist.gpt4
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.navigation.compose.rememberNavController
 import com.adziashko.todolist.gpt4.navigation.TodoAppNavigation
 import com.adziashko.todolist.gpt4.ui.theme.TodoAppTheme
@@ -15,8 +17,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TodoAppTheme {
-                val navController = rememberNavController()
-                TodoAppNavigation(navController = navController)
+                Surface(color = MaterialTheme.colors.background) {
+                    val navController = rememberNavController()
+                    TodoAppNavigation(navController = navController)
+                }
             }
         }
     }
