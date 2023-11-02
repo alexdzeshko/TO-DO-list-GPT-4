@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId "com.adziashko.todolist.gpt4"
-        minSdk 24
+        minSdk 23
         compileSdk 34
         targetSdk 33
         versionCode 1

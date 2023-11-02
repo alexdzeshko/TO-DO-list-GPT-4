@@ -11,17 +11,15 @@ import com.adziashko.todolist.gpt4.ui.data.State
 import com.adziashko.todolist.gpt4.ui.data.UIEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : ViewModel() {
     val state: LiveData<State<List<UIEntity>>> = taskDao.getAllTasks()
-        .onStart { delay(3000) }
+        //.onStart { delay(3000) }
         .map { taskList ->
             val (completed, todo) = taskList.partition { it.isCompleted }
             val resultList = mutableListOf<UIEntity>()

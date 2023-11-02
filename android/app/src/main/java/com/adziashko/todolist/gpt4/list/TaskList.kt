@@ -48,6 +48,7 @@ fun TaskList(viewModel: TaskListViewModel = hiltViewModel(), openTask: (task: Ta
             is State.Loading -> {
                 LoadingScreen()
             }
+
             is State.Done -> {
                 if (state.result.isSuccess) {
                     TaskList(
@@ -85,8 +86,7 @@ private fun AddTask(
         )
     } else {
         FloatingActionButton(
-            modifier = modifier
-                .padding(bottom = 16.dp, end = 16.dp),
+            modifier = modifier.then(Modifier.padding(16.dp)),
             onClick = { showDialog = true }
         ) {
             Icon(Icons.Default.Add, contentDescription = "Add Task")
@@ -96,8 +96,7 @@ private fun AddTask(
 
 @Composable
 fun TaskList(
-    uiEntities
-    : List<UIEntity>,
+    uiEntities: List<UIEntity>,
     onTaskClick: (Task) -> Unit,
     onTaskChecked: (Int, Boolean) -> Unit
 ) {
@@ -130,9 +129,9 @@ fun TaskItem(task: Task, onTaskClick: (Task) -> Unit, onCheckboxClick: (Boolean)
         Checkbox(
             checked = task.isCompleted,
             onCheckedChange = onCheckboxClick,
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier.padding(end = 10.dp)
         )
-        Spacer(Modifier.width(16.dp))
+        Spacer(Modifier.width(8.dp))
         Column(modifier = Modifier
             .fillMaxWidth()
             .clickable { onTaskClick(task) }) {
