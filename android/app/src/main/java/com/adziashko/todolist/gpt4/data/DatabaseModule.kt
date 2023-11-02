@@ -20,11 +20,11 @@ object DatabaseModule {
             appContext.applicationContext,
             TaskDatabase::class.java,
             "task_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
-    fun provideTaskDao(db:TaskDatabase): TaskDao {
+    fun provideTaskDao(db: TaskDatabase): TaskDao {
         return db.taskDao()
     }
 }

@@ -22,7 +22,7 @@ class EditTaskViewModel @Inject constructor(private val taskDao: TaskDao):ViewMo
         task.value = task.value?.copy(description = it)
     }
 
-    fun load(taskId: Int) {
+    fun load(taskId: Long) {
         task.addSource(taskDao.getTask(taskId).asLiveData()) { value ->
             run {
                 task.value = value

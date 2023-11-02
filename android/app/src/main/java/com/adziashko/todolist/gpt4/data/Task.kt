@@ -6,7 +6,7 @@ import com.adziashko.todolist.gpt4.ui.data.UIEntity
 
 @Entity(tableName = "tasks")
 data class Task(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) override val id: Long = 0,
     val title: String,
     val description: String,
     val isCompleted: Boolean = false

@@ -60,7 +60,7 @@ class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : View
         TODO("Not yet implemented")
     }
 
-    fun toggleTaskCompletionStatus(taskId: Int, isCompleted: Boolean) {
+    fun toggleTaskCompletionStatus(taskId: Long, isCompleted: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             taskDao.updateTaskCompletionStatus(taskId, isCompleted)
         }

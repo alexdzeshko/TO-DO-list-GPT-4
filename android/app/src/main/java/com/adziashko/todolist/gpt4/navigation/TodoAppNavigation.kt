@@ -20,7 +20,7 @@ fun TodoAppNavigation(navController: NavHostController) {
             route = "editTask/{taskId}",
             arguments = listOf(navArgument("taskId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val taskId = backStackEntry.arguments?.getInt("taskId")
+            val taskId = backStackEntry.arguments?.getLong("taskId")
             EditTaskScreen(
                 taskId = taskId!!,
                 onNavigateBack = {

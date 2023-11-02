@@ -98,10 +98,10 @@ private fun AddTask(
 fun TaskList(
     uiEntities: List<UIEntity>,
     onTaskClick: (Task) -> Unit,
-    onTaskChecked: (Int, Boolean) -> Unit
+    onTaskChecked: (Long, Boolean) -> Unit
 ) {
     LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
-        itemsIndexed(uiEntities) { index, uiEntity ->
+        itemsIndexed(uiEntities, key = { _, item -> item.id } ) { index, uiEntity ->
             if (uiEntity is Task) {
                 TaskItem(task = uiEntity, onTaskClick = onTaskClick,
                     onCheckboxClick = { checked -> onTaskChecked(uiEntity.id, checked) })

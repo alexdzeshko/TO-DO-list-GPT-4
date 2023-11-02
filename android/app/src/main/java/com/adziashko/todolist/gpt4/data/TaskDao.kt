@@ -9,7 +9,7 @@ interface TaskDao {
     fun getAllTasks(): Flow<List<Task>>
 
     @Query("SELECT * FROM tasks WHERE id=:taskId")
-    fun getTask(taskId: Int): Flow<Task>
+    fun getTask(taskId: Long): Flow<Task>
 
     @Insert
     fun insert(task: Task)
@@ -21,6 +21,6 @@ interface TaskDao {
     fun delete(task: Task)
 
     @Query("UPDATE tasks SET isCompleted = :isCompleted WHERE id = :taskId")
-    suspend fun updateTaskCompletionStatus(taskId: Int, isCompleted: Boolean)
+    suspend fun updateTaskCompletionStatus(taskId: Long, isCompleted: Boolean)
 
 }

@@ -13,7 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun EditTaskScreen(
     viewModel: EditTaskViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    taskId: Int
+    taskId: Long
 ) {
     val task by viewModel.task.observeAsState()
 
