@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
@@ -33,43 +33,34 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.adziashko.todolist.gpt4.add.AddTaskDialog
 import com.adziashko.todolist.gpt4.data.Task
+import com.adziashko.todolist.gpt4.loading.LoadingScreen
 import com.adziashko.todolist.gpt4.ui.data.ListHeader
+import com.adziashko.todolist.gpt4.ui.data.State
 import com.adziashko.todolist.gpt4.ui.data.UIEntity
 
 @Composable
 fun TaskList(viewModel: TaskListViewModel = hiltViewModel(), openTask: (task: Task) -> Unit) {
-    val tasks by  viewModel.tasks.observeAsState(emptyList())
-    var showDialog by remember { mutableStateOf(false) }
+    val state by viewModel.state.observeAsState(State.Loading())
     // A surface container using the 'background' color from the theme
 
     Box(modifier = Modifier.fillMaxSize()) {
-        TaskList(
-            tasks,
-            onTaskChecked = { taskId, checked ->
-                viewModel.toggleTaskCompletionStatus(taskId, checked)
-            },
-            onTaskClick = openTask
-        )
-        if (showDialog) {
-            AddTaskDialog(
-                onAddTask = { title, description ->
-                    viewModel.insert(Task(title = title, description = description))
-                    showDialog = false
-                },
-                onDismiss = { showDialog = false }
-            )
-        } else {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 16.dp, end = 16.dp)
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-                FloatingActionButton(
-                    onClick = { showDialog = true }
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Task")
+        when (state) {
+            is State.Loading -> {
+                LoadingScreen()
+            }
+            is State.Done -> {
+                if (state.result.isSuccess) {
+                    TaskList(
+                        state.result.getOrThrow(),
+                        onTaskChecked = { taskId, checked ->
+                            viewModel.toggleTaskCompletionStatus(taskId, checked)
+                        },
+                        onTaskClick = openTask
+                    )
+                } else {
+                    // todo error view
                 }
+                AddTask(viewModel, modifier = Modifier.align(Alignment.BottomEnd))
             }
         }
     }
@@ -77,19 +68,53 @@ fun TaskList(viewModel: TaskListViewModel = hiltViewModel(), openTask: (task: Ta
 }
 
 @Composable
+private fun AddTask(
+    viewModel: TaskListViewModel,
+    modifier: Modifier = Modifier,
+) {
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showDialog) {
+        AddTaskDialog(
+            onAddTask = { title, description ->
+                viewModel.insert(Task(title = title, description = description))
+                showDialog = false
+            },
+            onDismiss = { showDialog = false }
+        )
+    } else {
+        FloatingActionButton(
+            modifier = modifier
+                .padding(bottom = 16.dp, end = 16.dp),
+            onClick = { showDialog = true }
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add Task")
+        }
+    }
+}
+
+@Composable
 fun TaskList(
-    tasks: List<UIEntity>,
+    uiEntities
+    : List<UIEntity>,
     onTaskClick: (Task) -> Unit,
     onTaskChecked: (Int, Boolean) -> Unit
 ) {
-    LazyColumn (modifier = Modifier.padding(top = 8.dp)){
-        items(tasks) { task ->
-            if (task is Task) {
-                TaskItem(task = task, onTaskClick = onTaskClick,
-                    onCheckboxClick = { checked -> onTaskChecked(task.id, checked) })
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
-            } else if (task is ListHeader){
-                Text(text = task.title)
+    LazyColumn(modifier = Modifier.padding(top = 8.dp)) {
+        itemsIndexed(uiEntities) { index, uiEntity ->
+            if (uiEntity is Task) {
+                TaskItem(task = uiEntity, onTaskClick = onTaskClick,
+                    onCheckboxClick = { checked -> onTaskChecked(uiEntity.id, checked) })
+                if (index + 1 < uiEntities.size && uiEntities[index + 1] is Task) {
+                    Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                }
+            } else if (uiEntity is ListHeader) {
+                Text(
+                    text = uiEntity.title,
+                    Modifier.padding(8.dp),
+                    style = MaterialTheme.typography.h5
+                )
             }
         }
     }

@@ -50,6 +50,6 @@ fun AddTaskDialog(onAddTask: (String, String) -> Unit, onDismiss: () -> Unit) {
             Button(onClick = onDismiss) {
                 Text("Cancel")
             }
-        }
+        },
     )
 }

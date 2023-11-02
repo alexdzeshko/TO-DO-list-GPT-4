@@ -4,60 +4,65 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.adziashko.todolist.gpt4.ITaskViewModel
 import com.adziashko.todolist.gpt4.data.Task
 import com.adziashko.todolist.gpt4.data.TaskDao
 import com.adziashko.todolist.gpt4.ui.data.ListHeader
+import com.adziashko.todolist.gpt4.ui.data.State
 import com.adziashko.todolist.gpt4.ui.data.UIEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-const val TODO = false
-const val COMPLETED = true
-
 @HiltViewModel
-class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : ViewModel(),
-    ITaskViewModel {
-    override val tasks: LiveData<List<UIEntity>> = taskDao.getAllTasks().map { taskList ->
-        val grouped = taskList.groupBy { it.isCompleted }
-        val resultList = mutableListOf<UIEntity>()
-        grouped[TODO]?.let {
-            resultList.add(ListHeader("To-Do"))
-            resultList.addAll(it)
-        }
-        grouped[COMPLETED]?.let {
-            resultList.add(ListHeader("Completed"))
-            resultList.addAll(it)
-        }
-        resultList
-    }.asLiveData()
+class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : ViewModel() {
+    val state: LiveData<State<List<UIEntity>>> = taskDao.getAllTasks()
+        .onStart { delay(3000) }
+        .map { taskList ->
+            val (completed, todo) = taskList.partition { it.isCompleted }
+            val resultList = mutableListOf<UIEntity>()
+            if (todo.isNotEmpty()) {
+                resultList.add(ListHeader("To-Do"))//todo get string from resources/or set to string res
+                resultList.addAll(todo)
+            }
+            if (completed.isNotEmpty()) {
+                resultList.add(ListHeader("Completed"))
+                resultList.addAll(completed)
+            }
+            resultList
+        }.map {result ->
+            State.Done(Result.success(result))
+        }.catch { error ->
+            State.Done<List<UIEntity>>(Result.failure(error))
+        }.asLiveData()
 
-    override fun insert(task: Task) {
+    fun insert(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
             taskDao.insert(task)
         }
     }
 
-    override fun update(task: Task) {
+    fun update(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
             taskDao.update(task)
         }
     }
 
-    override fun delete(task: Task) {
+    fun delete(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
             taskDao.delete(task)
         }
     }
 
-    override fun deleteCompletedTasks() {
+    fun deleteCompletedTasks() {
         TODO("Not yet implemented")
     }
 
-    override fun toggleTaskCompletionStatus(taskId: Int, isCompleted: Boolean) {
+    fun toggleTaskCompletionStatus(taskId: Int, isCompleted: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             taskDao.updateTaskCompletionStatus(taskId, isCompleted)
         }
