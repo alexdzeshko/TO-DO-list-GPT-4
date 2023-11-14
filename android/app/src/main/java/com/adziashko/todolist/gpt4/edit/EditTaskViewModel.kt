@@ -7,12 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.adziashko.todolist.gpt4.data.Task
 import com.adziashko.todolist.gpt4.data.TaskDao
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditTaskViewModel @Inject constructor(private val taskDao: TaskDao):ViewModel() {
+class EditTaskViewModel @Inject constructor(private val taskDao: TaskDao) : ViewModel() {
 
     val task: MediatorLiveData<Task> = MediatorLiveData()
     val onTitleChange: (String) -> Unit = {
@@ -30,9 +29,10 @@ class EditTaskViewModel @Inject constructor(private val taskDao: TaskDao):ViewMo
         }
     }
 
-    fun update() {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun update(onComplete: () -> Unit) {
+        viewModelScope.launch {
             taskDao.update(task.value!!)
+            onComplete()
         }
     }
 

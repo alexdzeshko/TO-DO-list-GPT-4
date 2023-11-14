@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TO-DO list GPT-4</string>
+    <string name="list_header_todo">TO-DO</string>
+    <string name="list_header_completed">Completed</string>
 </resources>

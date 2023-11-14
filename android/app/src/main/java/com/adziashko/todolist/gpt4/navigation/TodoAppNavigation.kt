@@ -18,7 +18,7 @@ fun TodoAppNavigation(navController: NavHostController) {
         }
         composable(
             route = "editTask/{taskId}",
-            arguments = listOf(navArgument("taskId") { type = NavType.IntType })
+            arguments = listOf(navArgument("taskId") { type = NavType.LongType })
         ) { backStackEntry ->
             val taskId = backStackEntry.arguments?.getLong("taskId")
             EditTaskScreen(

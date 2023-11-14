@@ -12,13 +12,13 @@ interface TaskDao {
     fun getTask(taskId: Long): Flow<Task>
 
     @Insert
-    fun insert(task: Task)
+    suspend fun insert(task: Task)
 
     @Update
-    fun update(task: Task)
+    suspend fun update(task: Task)
 
     @Delete
-    fun delete(task: Task)
+    suspend fun delete(task: Task)
 
     @Query("UPDATE tasks SET isCompleted = :isCompleted WHERE id = :taskId")
     suspend fun updateTaskCompletionStatus(taskId: Long, isCompleted: Boolean)

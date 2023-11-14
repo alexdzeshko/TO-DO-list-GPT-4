@@ -1,7 +1,9 @@
 package com.adziashko.todolist.gpt4.ui.data
 
+import androidx.annotation.StringRes
+
 @JvmInline
-value class ListHeader(val title: String):UIEntity {
+value class ListHeader(@StringRes val titleRes: Int):UiEntity {
     override val id: Long
-        get() = title.hashCode().toLong()
+        get() = titleRes.toLong()
 }

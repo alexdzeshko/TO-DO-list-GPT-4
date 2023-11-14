@@ -1,16 +1,14 @@
 package com.adziashko.todolist.gpt4.list
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.adziashko.todolist.gpt4.R
 import com.adziashko.todolist.gpt4.data.Task
 import com.adziashko.todolist.gpt4.data.TaskDao
 import com.adziashko.todolist.gpt4.ui.data.ListHeader
-import com.adziashko.todolist.gpt4.ui.data.State
-import com.adziashko.todolist.gpt4.ui.data.UIEntity
+import com.adziashko.todolist.gpt4.ui.data.UiEntity
+import com.adziashko.todolist.gpt4.ui.data.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -18,40 +16,41 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : ViewModel() {
-    val state: LiveData<State<List<UIEntity>>> = taskDao.getAllTasks()
-        //.onStart { delay(3000) }
+    val initialState = UiState.Loading<List<Task>>()
+
+    val uiState = taskDao.getAllTasks()
         .map { taskList ->
             val (completed, todo) = taskList.partition { it.isCompleted }
-            val resultList = mutableListOf<UIEntity>()
+            val resultList = mutableListOf<UiEntity>()
             if (todo.isNotEmpty()) {
-                resultList.add(ListHeader("To-Do"))//todo get string from resources/or set to string res
+                resultList.add(ListHeader(R.string.list_header_todo))
                 resultList.addAll(todo)
             }
             if (completed.isNotEmpty()) {
-                resultList.add(ListHeader("Completed"))
+                resultList.add(ListHeader(R.string.list_header_completed))
                 resultList.addAll(completed)
             }
             resultList
-        }.map {result ->
-            State.Done(Result.success(result))
+        }.map { result ->
+            UiState.Done(Result.success(result))
         }.catch { error ->
-            State.Done<List<UIEntity>>(Result.failure(error))
-        }.asLiveData()
+            UiState.Done<List<UiEntity>>(Result.failure(error))
+        }
 
-    fun insert(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun addNewTask(task: Task) {
+        viewModelScope.launch {
             taskDao.insert(task)
         }
     }
 
     fun update(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             taskDao.update(task)
         }
     }
 
     fun delete(task: Task) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             taskDao.delete(task)
         }
     }
@@ -61,7 +60,7 @@ class TaskListViewModel @Inject constructor(private val taskDao: TaskDao) : View
     }
 
     fun toggleTaskCompletionStatus(taskId: Long, isCompleted: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             taskDao.updateTaskCompletionStatus(taskId, isCompleted)
         }
     }
