@@ -22,12 +22,13 @@ fun TaskItem(
     task: Task,
     onTaskClick: (Task) -> Unit,
     onCheckboxClick: (Boolean) -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .clickable { onTaskClick(task) }
     ) {
         Checkbox(
             checked = task.isCompleted,
@@ -36,8 +37,7 @@ fun TaskItem(
         )
         Spacer(Modifier.width(8.dp))
         Column(modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onTaskClick(task) }) {
+            .fillMaxWidth()) {
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.h6,
